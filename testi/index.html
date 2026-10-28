@@ -55,7 +55,9 @@ for(const [fi,pair] of Object.entries(dict)){reverse.en.set(pair[0],fi);reverse.
 const originals=new WeakMap(),attrs=new WeakMap();
 let lang='fi',busy=false,observer;
 try{const saved=localStorage.getItem('vl-language');if(['fi','sv','en'].includes(saved))lang=saved}catch(e){}
-function source(value,old){if(old&&[old,...(dict[old]||[])].includes(value))return old;if(dict[value])return value;return reverse.en.get(value)||reverse.sv.get(value)||value}
+function source(value,old){if(old)return old;if(dict[value])return value;return reverse.en.get(value)||reverse.sv.get(value)||value}
+const phraseKeys=Object.keys(dict).filter(k=>k.length>=18).sort((a,b)=>b.length-a.length);
+function translateText(fi){if(lang==='fi')return fi;const i=lang==='en'?0:1;if(dict[fi])return dict[fi][i];const special=dynamic(fi);if(special!==null)return special;let out=fi;for(const key of phraseKeys){if(out.includes(key)&&typeof dict[key][i]==='string')out=out.split(key).join(dict[key][i]);}return out;}
 function dynamic(fi){
  if(lang==='fi')return fi;
  const i=lang==='en'?0:1;
@@ -78,8 +80,8 @@ function apply(){
  const pageTitle='Varjoluoto Kiinteistöt | Vuokra-asunnot ja vuokranantajan palvelut';if(document.title===pageTitle||document.title===dict[pageTitle][0]||document.title===dict[pageTitle][1])document.title=lang==='fi'?pageTitle:dict[pageTitle][lang==='en'?0:1];
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
  while(walker.nextNode()){const node=walker.currentNode,el=node.parentElement;if(!el||el.closest('script,style,svg,textarea,[contenteditable="true"],[data-user-content]'))continue;
- const current=node.nodeValue,clean=current.trim();if(!clean)continue;const fi=source(clean,originals.get(node));const translated=dict[fi]?(lang==='fi'?fi:dict[fi][lang==='en'?0:1]):dynamic(fi);if(translated===null)continue;originals.set(node,fi);const value=translated;if(clean!==value)node.nodeValue=current.replace(clean,value)}
- document.querySelectorAll('[placeholder],[aria-label],[title],[alt]').forEach(el=>{for(const name of ['placeholder','aria-label','title','alt']){if(!el.hasAttribute(name))continue;const val=el.getAttribute(name);let original=attrs.get(el)||{};const fi=source(val,original[name]);if(!dict[fi])continue;original[name]=fi;attrs.set(el,original);el.setAttribute(name,lang==='fi'?fi:dict[fi][lang==='en'?0:1])}});
+ const current=node.nodeValue,clean=current.trim();if(!clean)continue;const fi=source(clean,originals.get(node));const value=translateText(fi);if(value===fi&&lang!=='fi')continue;originals.set(node,fi);if(clean!==value)node.nodeValue=current.replace(clean,value)}
+ document.querySelectorAll('[placeholder],[aria-label],[title],[alt]').forEach(el=>{for(const name of ['placeholder','aria-label','title','alt']){if(!el.hasAttribute(name))continue;const val=el.getAttribute(name);let original=attrs.get(el)||{};const fi=source(val,original[name]);const translated=translateText(fi);if(translated===fi&&lang!=='fi')continue;original[name]=fi;attrs.set(el,original);el.setAttribute(name,translated)}});
  document.querySelectorAll('.vl-lang-choice').forEach(button=>{const selected=button.dataset.lang===lang;button.classList.toggle('is-selected',selected);button.setAttribute('aria-pressed',String(selected))});
  }finally{busy=false;if(observer)observer.observe(document.body,{childList:true,characterData:true,subtree:true})}
 }
