@@ -93,6 +93,21 @@ function apply(){
  /* Location labels must be translated as complete units, not mixed across languages. */
  const locations={"Porvoo · Keskusta":["Porvoo · City centre","Borgå · Centrum"],"Porvoo · Gammelbacka":["Porvoo · Gammelbacka","Borgå · Gammelbacka"],"Porvoo · Kevätkumpu":["Porvoo · Kevätkumpu","Borgå · Vårberga"],"Sipoo · Nikkilä":["Sipoo · Nikkilä","Sibbo · Nickby"]};
  document.querySelectorAll('#results .home-highlights + .home-body .tag, #results .home-body .tag').forEach(el=>{const raw=el.dataset.vlLocationFi||Object.keys(locations).find(k=>k===el.textContent.trim()||locations[k].includes(el.textContent.trim()));if(!raw)return;el.dataset.vlLocationFi=raw;el.textContent=lang==='fi'?raw:locations[raw][lang==='en'?0:1]});
+ /* Keep canonical Finnish search values while localizing visible municipality labels. */
+ const swedishCities={'Porvoo':'Borgå','Helsinki':'Helsingfors','Sipoo':'Sibbo','Loviisa':'Lovisa','Turku':'Åbo','Espoo':'Esbo','Vantaa':'Vanda','Kauniainen':'Grankulla','Kirkkonummi':'Kyrkslätt','Raasepori':'Raseborg','Hanko':'Hangö','Inkoo':'Ingå','Siuntio':'Sjundeå','Lapinjärvi':'Lappträsk','Pietarsaari':'Jakobstad','Vaasa':'Vasa','Kokkola':'Karleby','Kristiinankaupunki':'Kristinestad','Uusikaarlepyy':'Nykarleby','Maarianhamina':'Mariehamn','Parainen':'Pargas','Kemiönsaari':'Kimitoön','Tammisaari':'Ekenäs','Pohja':'Pojo','Karjaa':'Karis','Närpiö':'Närpes','Mustasaari':'Korsholm','Luoto':'Larsmo','Pedersören kunta':'Pedersöre','Ahvenanmaa':'Åland'};
+ const swedishRegions={'Uusimaa':'Nyland','Varsinais-Suomi':'Egentliga Finland','Itä-Uusimaa':'Östra Nyland','Pohjanmaa':'Österbotten','Keski-Pohjanmaa':'Mellersta Österbotten','Etelä-Pohjanmaa':'Södra Österbotten','Pohjois-Pohjanmaa':'Norra Österbotten','Kanta-Häme':'Egentliga Tavastland','Päijät-Häme':'Päijänne-Tavastland','Pirkanmaa':'Birkaland','Satakunta':'Satakunta','Kymenlaakso':'Kymmenedalen','Etelä-Karjala':'Södra Karelen','Pohjois-Karjala':'Norra Karelen','Etelä-Savo':'Södra Savolax','Pohjois-Savo':'Norra Savolax','Keski-Suomi':'Mellersta Finland','Kainuu':'Kajanaland','Lappi':'Lappland'};
+ document.querySelectorAll('select#region,select#city,select#premises-region,select#premises-city,select#vl-watch-region,select#vl-watch-city, datalist option').forEach(selectOrOption=>{
+   const options=selectOrOption.tagName==='OPTION'?[selectOrOption]:Array.from(selectOrOption.options||[]);
+   const isRegion=/region/.test(selectOrOption.id);
+   for(const option of options){
+     const canonical=option.value;
+     if(!canonical)continue;
+     const localized=lang==='sv'?(isRegion?swedishRegions[canonical]:swedishCities[canonical]):null;
+     if(selectOrOption.tagName==='OPTION'){if(localized&&option.label!==localized)option.label=localized;}
+     else if(localized&&option.textContent!==localized)option.textContent=localized;
+     else if(lang!=='sv'&&option.textContent!==canonical)option.textContent=canonical;
+   }
+ });
  const favoriteNode=document.getElementById('favorites-count');if(favoriteNode&&typeof window.vlFavoriteCount==='function'){const found=favoriteNode.textContent.match(/^\s*(\d+)/);if(found)favoriteNode.textContent=window.vlFavoriteCount(Number(found[1]));}
  const countNode=document.getElementById('count');if(countNode&&typeof window.vlResultCount==='function'){const match=countNode.textContent.match(/^\s*(\d+)/);if(match)countNode.textContent=window.vlResultCount(Number(match[1]));}
  document.querySelectorAll('.vl-lang-choice').forEach(button=>{const selected=button.dataset.lang===lang;button.classList.toggle('is-selected',selected);button.setAttribute('aria-pressed',String(selected))});
