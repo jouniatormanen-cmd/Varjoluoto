@@ -73,6 +73,8 @@ function dynamic(fi){
  for(const [fiPrefix,enPrefix,svPrefix] of dynamicPrefixes){if(fi.startsWith(fiPrefix))return (lang==='en'?enPrefix:svPrefix)+fi.slice(fiPrefix.length)}
  return null;
 }
+/* v0.19.1: kuntien ja maakuntien kielinimet, hakujen alkuperäiset arvot säilyvät */
+Object.assign(dict,{"Porvoo":["Porvoo","Borgå"],"Sipoo":["Sipoo","Sibbo"],"Loviisa":["Loviisa","Lovisa"],"Helsinki":["Helsinki","Helsingfors"],"Espoo":["Espoo","Esbo"],"Vantaa":["Vantaa","Vanda"],"Kauniainen":["Kauniainen","Grankulla"],"Lapinjärvi":["Lapinjärvi","Lappträsk"],"Raasepori":["Raasepori","Raseborg"],"Hanko":["Hanko","Hangö"],"Inkoo":["Inkoo","Ingå"],"Siuntio":["Siuntio","Sjundeå"],"Kirkkonummi":["Kirkkonummi","Kyrkslätt"],"Myrskylä":["Myrskylä","Mörskom"],"Pukkila":["Pukkila","Pukkila"],"Askola":["Askola","Askola"],"Turku":["Turku","Åbo"],"Tampere":["Tampere","Tammerfors"],"Vaasa":["Vaasa","Vasa"],"Oulu":["Oulu","Uleåborg"],"Pietarsaari":["Pietarsaari","Jakobstad"],"Kokkola":["Kokkola","Karleby"],"Kristiinankaupunki":["Kristiinankaupunki","Kristinestad"],"Uusikaarlepyy":["Uusikaarlepyy","Nykarleby"],"Parainen":["Parainen","Pargas"],"Kemiönsaari":["Kemiönsaari","Kimitoön"],"Maarianhamina":["Maarianhamina","Mariehamn"],"Ahvenanmaa":["Åland","Åland"],"Uusimaa":["Uusimaa","Nyland"],"Varsinais-Suomi":["Southwest Finland","Egentliga Finland"],"Pohjanmaa":["Ostrobothnia","Österbotten"],"Keski-Pohjanmaa":["Central Ostrobothnia","Mellersta Österbotten"],"Pohjois-Pohjanmaa":["North Ostrobothnia","Norra Österbotten"],"Etelä-Pohjanmaa":["South Ostrobothnia","Södra Österbotten"],"Itä-Uusimaa":["Eastern Uusimaa","Östra Nyland"]});
 function apply(){
  if(busy||!document.body)return;busy=true;if(observer)observer.disconnect();
  try{
