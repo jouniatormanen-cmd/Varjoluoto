@@ -108,6 +108,14 @@ function apply(){
      else if(lang!=='sv'&&option.textContent!==canonical)option.textContent=canonical;
    }
  });
+ /* Sort visible location names per selected language, without changing canonical search values. */
+ const collator=new Intl.Collator(lang==='sv'?'sv-FI':lang==='en'?'en':'fi-FI',{sensitivity:'base',numeric:true});
+ document.querySelectorAll('select#region,select#city,select#premises-region,select#premises-city,select#vl-watch-region,select#vl-watch-city').forEach(select=>{
+   const all=Array.from(select.options),fixed=all.filter(option=>!option.value),places=all.filter(option=>option.value);
+   const sorted=places.slice().sort((a,b)=>collator.compare(a.textContent.trim(),b.textContent.trim()));
+   const desired=[...fixed,...sorted];
+   if(desired.some((option,index)=>option!==all[index]))select.replaceChildren(...desired);
+ });
  const favoriteNode=document.getElementById('favorites-count');if(favoriteNode&&typeof window.vlFavoriteCount==='function'){const found=favoriteNode.textContent.match(/^\s*(\d+)/);if(found)favoriteNode.textContent=window.vlFavoriteCount(Number(found[1]));}
  const countNode=document.getElementById('count');if(countNode&&typeof window.vlResultCount==='function'){const match=countNode.textContent.match(/^\s*(\d+)/);if(match)countNode.textContent=window.vlResultCount(Number(match[1]));}
  document.querySelectorAll('.vl-lang-choice').forEach(button=>{const selected=button.dataset.lang===lang;button.classList.toggle('is-selected',selected);button.setAttribute('aria-pressed',String(selected))});
