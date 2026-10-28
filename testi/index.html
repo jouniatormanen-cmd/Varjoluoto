@@ -68,13 +68,13 @@ function dynamic(fi){
  for(const key of ['Arvioitu vuositulo kulujen jälkeen:','Vuokratulon laskelma –','Hakutoive:']){
  if(fi.startsWith(key+' '))return dict[key][i]+fi.slice(key.length);
  }
- if(/^Näytä .+ kartalla ↗$/.test(fi))return (lang==='en'?'Show ':'Visa ')+fi.slice(6,-10)+(lang==='en'?' on map ↗':' på kartan ↗');
+ const mapMatch=fi.match(/^Näytä (.+) kartalla ↗$/);if(mapMatch)return (lang==='en'?'Show ':'Visa ')+translateText(mapMatch[1])+(lang==='en'?' on map ↗':' på kartan ↗');
  if(fi.startsWith('Vuokratulot ')&&fi.includes(' − vuosikulut ')){
  let out=fi.replace('Vuokratulot ',dict['Vuokratulot'][i]+' ').replace(' − vuosikulut ',' − '+dict['vuosikulut'][i]+' ');
  out=out.replace('Ei sisällä veroja, rahoituskuluja eikä remontteja.',dict['Ei sisällä veroja, rahoituskuluja eikä remontteja.'][i]);return out;
  }
  const dynamicPrefixes=[['Näytä ','Show ','Visa '],['Avaa asuntoilmoitus: ','Open listing: ','Öppna bostadsannons: '],['Näytä esimerkkikuva ','Show sample image ','Visa exempelbild '],['Näytä kaikki ','Show all ','Visa alla ']];
- for(const [fiPrefix,enPrefix,svPrefix] of dynamicPrefixes){if(fi.startsWith(fiPrefix))return (lang==='en'?enPrefix:svPrefix)+fi.slice(fiPrefix.length)}
+ for(const [fiPrefix,enPrefix,svPrefix] of dynamicPrefixes){if(fi.startsWith(fiPrefix))return (lang==='en'?enPrefix:svPrefix)+translateText(fi.slice(fiPrefix.length))}
  return null;
 }
 function apply(){
@@ -86,6 +86,8 @@ function apply(){
  while(walker.nextNode()){const node=walker.currentNode,el=node.parentElement;if(!el||el.closest('script,style,svg,textarea,[contenteditable="true"],[data-user-content]'))continue;
  const current=node.nodeValue,clean=current.trim();if(!clean)continue;if(el.tagName==='OPTION'&&!el.hasAttribute('value'))el.setAttribute('value',source(clean,originals.get(node)));const fi=source(clean,originals.get(node));const value=translateText(fi);if(value===fi&&lang!=='fi')continue;originals.set(node,fi);if(clean!==value)node.nodeValue=current.replace(clean,value)}
  document.querySelectorAll('[placeholder],[aria-label],[title],[alt]').forEach(el=>{for(const name of ['placeholder','aria-label','title','alt']){if(!el.hasAttribute(name))continue;const val=el.getAttribute(name);let original=attrs.get(el)||{};const fi=source(val,original[name]);const translated=translateText(fi);if(translated===fi&&lang!=='fi')continue;original[name]=fi;attrs.set(el,original);el.setAttribute(name,translated)}});
+ /* Translate option labels but preserve their original Finnish filter values. */
+ document.querySelectorAll('option:not([value])').forEach(option=>{const original=option.textContent.trim();if(!option.dataset.vlOriginalValue)option.dataset.vlOriginalValue=source(original);option.value=option.dataset.vlOriginalValue});
  const favoriteNode=document.getElementById('favorites-count');if(favoriteNode&&typeof window.vlFavoriteCount==='function'){const found=favoriteNode.textContent.match(/^\s*(\d+)/);if(found)favoriteNode.textContent=window.vlFavoriteCount(Number(found[1]));}
  const countNode=document.getElementById('count');if(countNode&&typeof window.vlResultCount==='function'){const match=countNode.textContent.match(/^\s*(\d+)/);if(match)countNode.textContent=window.vlResultCount(Number(match[1]));}
  document.querySelectorAll('.vl-lang-choice').forEach(button=>{const selected=button.dataset.lang===lang;button.classList.toggle('is-selected',selected);button.setAttribute('aria-pressed',String(selected))});
