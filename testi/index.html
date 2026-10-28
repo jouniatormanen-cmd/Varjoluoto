@@ -79,7 +79,7 @@ function apply(){
  const select=document.getElementById('vl-language-select');if(select)select.value=lang;
  }finally{busy=false;if(observer)observer.observe(document.body,{childList:true,characterData:true,subtree:true})}
 }
-function init(){const select=document.getElementById('vl-language-select');if(select)select.addEventListener('change',function(){lang=this.value;try{localStorage.setItem('vl-language',lang)}catch(e){}apply()});apply();observer=new MutationObserver(()=>{if(!busy)apply()});observer.observe(document.body,{childList:true,characterData:true,subtree:true})}
+function init(){const select=document.getElementById('vl-language-select');if(select)select.addEventListener('change',function(){lang=this.value;try{localStorage.setItem('vl-language',lang)}catch(e){}apply();const nav=document.getElementById('mobile-site-nav'),toggle=document.querySelector('.mobile-menu-toggle');if(nav&&toggle&&nav.classList.contains('is-open')){nav.classList.remove('is-open');toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label',lang==='en'?'Open menu':lang==='sv'?'Öppna menyn':'Avaa valikko');toggle.textContent='☰';}});apply();observer=new MutationObserver(()=>{if(!busy)apply()});observer.observe(document.body,{childList:true,characterData:true,subtree:true})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body></html>
