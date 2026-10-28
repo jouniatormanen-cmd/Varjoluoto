@@ -136,7 +136,7 @@ function apply(){const t=tr[language()]||tr.fi;document.querySelectorAll('.renta
 const labels=form.querySelectorAll('label');labels.forEach((label,i)=>{if(!t[i+2])return;const node=Array.from(label.childNodes).find(n=>n.nodeType===3);if(node)node.textContent=t[i+2];});
 const textarea=form.querySelector('textarea');if(textarea)textarea.placeholder=t[8];
 const btn=form.querySelector('[type="submit"]');if(btn)btn.textContent=t[9];
-const status=form.querySelector('[role="status"]');if(status)status.textContent=status.dataset.submitted==='yes'?t[11]:t[10];
+const status=form.querySelector('[role="status"]');if(status)status.textContent=status.dataset.submitted==='yes'?({fi:'Kiitos! Tämä on vain hakemuksen vahvistuksen esikatselu. Hakemustasi ei lähetetty eikä tallennettu. Oikeassa palvelussa otamme sinuun yhteyttä mahdollisimman pian.',sv:'Tack! Detta är endast en förhandsvisning av bekräftelsen. Din ansökan har inte skickats eller sparats. I den riktiga tjänsten kontaktar vi dig så snart som möjligt.',en:'Thank you! This is only a preview of the application confirmation. Your application was not sent or saved. In the live service, we will contact you as soon as possible.'}[language()]||t[11]):t[10];
 const h=form.previousElementSibling,p=h?.previousElementSibling;if(h&&h.tagName==='P'&&p&&p.tagName==='H3'){p.textContent=t[0];h.textContent=t[1]}
 });
 document.querySelectorAll('button').forEach(b=>{if(b.getAttribute('onclick')?.includes('rental-application')&&/^(Hae asuntoa|Ansök om bostaden|Apply for this home)/.test(b.textContent.trim()))b.textContent=t[12]});
